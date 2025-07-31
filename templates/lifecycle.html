@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Audit Lifecycle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Compliance Audit Lifecycle</h2>
+        <section>
+            <p>
+                The compliance audit process follows a structured lifecycle to ensure thoroughness and consistency. Each stage has specific activities and timelines.
+            </p>
+            <div class="lifecycle-container">
+                {% for stage in lifecycle_stages %}
+                    <div class="lifecycle-stage">
+                        <h3>{{ stage.stage }}</h3>
+                        <p><strong>Timeline:</strong> {{ stage.timeline }}</p>
+                        <h4>Details:</h4>
+                        <ul>
+                            {% for detail in stage.details %}
+                                <li>{{ detail }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>

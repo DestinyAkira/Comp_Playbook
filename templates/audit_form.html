@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Audit Form</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Interactive Audit Form</h2>
+        <section class="form-selection-container">
+            <form method="POST" action="{{ url_for('audit_form') }}">
+                <label for="domain_select">Select a Domain to Audit:</label>
+                <select name="domain_select" id="domain_select" onchange="this.form.submit()">
+                    <option value="">-- Select --</option>
+                    {% for domain in domains %}
+                        <option value="{{ domain }}" {% if selected_domain == domain %}selected{% endif %}>
+                            {{ domain }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </section>
+
+        {% if selected_domain %}
+            <section class="audit-questions-container">
+                <h3>Audit Questions for {{ selected_domain }}</h3>
+                <form method="POST" action="{{ url_for('submit_audit') }}">
+                    <input type="hidden" name="domain" value="{{ selected_domain }}">
+                    {% for question in questions %}
+                        <div class="question-block">
+                            <label for="{{ question.id }}">{{ loop.index }}. {{ question.question }}</label>
+                            {% if question.type == 'radio' %}
+                                <div class="radio-group">
+                                    {% for option in question.options %}
+                                        <input type="radio" id="{{ question.id }}_{{ loop.index }}" name="{{ question.id }}" value="{{ option }}" required>
+                                        <label for="{{ question.id }}_{{ loop.index }}">{{ option }}</label>
+                                    {% endfor %}
+                                </div>
+                            {% elif question.type == 'text' %}
+                                <input type="text" id="{{ question.id }}" name="{{ question.id }}" placeholder="{{ question.placeholder or '' }}" required>
+                            {% elif question.type == 'textarea' %}
+                                <textarea id="{{ question.id }}" name="{{ question.id }}" rows="4" placeholder="{{ question.placeholder or '' }}" required></textarea>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit">Submit Audit Responses</button>
+                </form>
+            </section>
+        {% else %}
+            <section class="select-domain-message">
+                <p>Please select a domain from the dropdown above to view the audit questions.</p>
+            </section>
+        {% endif %}
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>

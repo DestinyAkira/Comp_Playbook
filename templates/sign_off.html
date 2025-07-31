@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Sign Off</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li> {# Added new navigation link #}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Playbook & SOP Sign-Off</h2>
+        <section class="sign-off-container">
+            <p>Please enter your name below to confirm that you have reviewed the Compliance Playbook and the Standard Operating Procedure (SOP).</p>
+
+            {% if message %}
+                <p class="form-message">{{ message }}</p>
+            {% endif %}
+
+            {% if show_form %}
+                <form method="POST" action="{{ url_for('sign_off') }}">
+                    <div class="form-group">
+                        <label for="user_name">Your Full Name:</label>
+                        <input type="text" id="user_name" name="user_name" required>
+                    </div>
+                    <button type="submit">Sign Off</button>
+                </form>
+            {% else %}
+                <p>Thank you for your submission. You can return to the <a href="/">Home page</a> or <a href="/supporting_files">Supporting Files</a>.</p>
+            {% endif %}
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>

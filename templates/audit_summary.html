@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-Tür">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Audit Summary</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Audit Summary</h2>
+        <section class="summary-container">
+            <h3>Submitted Responses for <span>{{ submitted_domain }}</span></h3>
+            <div class="responses-list">
+                {% if audit_responses %}
+                    {% for question, response in audit_responses.items() %}
+                        <div class="response-item">
+                            <p class="question-text"><strong>Q:</strong> {{ question }}</p>
+                            <p class="response-text"><strong>A:</strong> {{ response }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No responses were submitted or found for this domain.</p>
+                {% endif %}
+            </div>
+            <div class="summary-actions">
+                <a href="{{ url_for('audit_form') }}" class="button secondary-button">Go Back to Audit Form</a>
+                <a href="{{ url_for('index') }}" class="button">Return Home</a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>

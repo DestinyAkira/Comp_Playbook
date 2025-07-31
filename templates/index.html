@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Welcome to the Compliance Playbook!</h2>
+        <section>
+            <h3>Purpose of this Playbook</h3>
+            <p>
+                This Compliance Playbook serves as a comprehensive guide for ensuring adherence to data governance, privacy, and regulatory standards across all data-related activities within our organization. It outlines procedures, roles, and resources necessary to maintain a robust compliance framework.
+            </p>
+            <p>
+                The playbook aims to standardize our approach to data management, mitigate risks, and foster a culture of compliance. It includes an interactive audit form, a score calculator for compliance assessment, and a centralized repository for supporting documents.
+            </p>
+        </section>
+
+        <section class="visual-workflow">
+            <h3>Compliance Audit Workflow Overview</h3>
+            <div class="workflow-diagram">
+                <p>START</p>
+                <p>  ↓</p>
+                <p>1. Audit Preparation (Select Domain, Share Self-Assessment)</p>
+                <p>  ↓</p>
+                <p>2. Question Development (Customize Template, Reference Regs)</p>
+                <p>  ↓</p>
+                <p>3. Conducting Interviews (Engage Domain Leads)</p>
+                <p>  ↓</p>
+                <p>4. Scoring & Evaluation (Assess Data Cleaning, Storage, Compliance)</p>
+                <p>  ↓</p>
+                <p>5. Compiling the Report (Summarize Findings, Recommend Actions)</p>
+                <p>  ↓</p>
+                <p>6. Submission & Feedback (Share with Stakeholders, Agree on Remediation)</p>
+                <p>  ↓</p>
+                <p>7. Archiving & Continuous Improvement (Secure Records, Refine Process)</p>
+                <p>  ↓</p>
+                <p>END</p>
+            </div>
+            <p>For detailed steps, please refer to the <a href="/lifecycle">Audit Lifecycle</a> page.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>

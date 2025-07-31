@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Score Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Compliance Score Calculator</h2>
+        <section>
+            <p>
+                Enter the scores for each audit section below to calculate the overall compliance rating.
+                Scores are based on a rubric detailed in the <a href="/lifecycle">Audit Lifecycle</a>.
+            </p>
+            <form id="scoreForm">
+                <div class="score-section">
+                    <label for="data_cleaning">Data Cleaning & Processing (Max: 40):</label>
+                    <input type="number" id="data_cleaning" name="data_cleaning" min="0" max="40" value="0" required>
+                </div>
+                <div class="score-section">
+                    <label for="data_storage">Data Storage, Security & Privacy (Max: 30):</label>
+                    <input type="number" id="data_storage" name="data_storage" min="0" max="30" value="0" required>
+                </div>
+                <div class="score-section">
+                    <label for="compliance">Compliance & Accountability (Max: 20):</label>
+                    <input type="number" id="compliance" name="compliance" min="0" max="20" value="0" required>
+                </div>
+                <div class="score-section">
+                    <label for="improvement">Continuous Improvement & Culture (Max: 10):</label>
+                    <input type="number" id="improvement" name="improvement" min="0" max="10" value="0" required>
+                </div>
+                <button type="submit">Calculate Score</button>
+            </form>
+
+            <div id="scoreResults" class="score-results" style="display:none;">
+                <h3>Overall Compliance Rating:</h3>
+                <p>Total Score: <span id="totalScore"></span></p>
+                <p>Rating: <span id="rating"></span></p>
+                <p>Meaning: <span id="meaning"></span></p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('scoreForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            fetch('/calculate_score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Indicate JSON content
+                },
+                body: JSON.stringify(data) // Send data as JSON
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('totalScore').textContent = result.total_score;
+                document.getElementById('rating').textContent = result.rating;
+                document.getElementById('meaning').textContent = result.meaning;
+
+                // Apply dynamic class for rating color
+                const ratingElement = document.getElementById('rating');
+                ratingElement.classList.remove('rating-compliant', 'rating-partially-compliant', 'rating-non-compliant'); // Clear previous classes
+                if (result.rating.includes('Compliant') && !result.rating.includes('Partially')) {
+                    ratingElement.classList.add('rating-compliant');
+                } else if (result.rating.includes('Partially Compliant')) {
+                    ratingElement.classList.add('rating-partially-compliant');
+                } else if (result.rating.includes('Non-Compliant')) {
+                    ratingElement.classList.add('rating-non-compliant');
+                }
+
+                document.getElementById('scoreResults').style.display = 'block'; // Show results
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while calculating the score.');
+            });
+        });
+    </script>
+</body>
+</html>

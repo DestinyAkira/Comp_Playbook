@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Self-Assessment Form</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Self-Assessment Form</h2>
+        <section class="microsoft-form-embed">
+            <p>Please complete the self-assessment form below:</p>
+            <iframe
+                width="800px"
+                height="1000px"
+                src="https://forms.office.com/pages/responsepage.aspx?id=yBYenGWkHEKCsuGTqGHi7xc6A347V3lDtBGXyq82yoJURTg5N1k2TUIzUEpSRFYxR1RSTFRDWVNXSS4u&route=shorturl"
+                frameborder="0"
+                marginwidth="0"
+                marginheight="0"
+                style="border: none; max-width:100%;"
+                allowfullscreen
+                webkitallowfullscreen
+                mozallowfullscreen
+                msallowfullscreen>
+            </iframe>
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="{{ url_for('supporting_files') }}" class="button secondary-button">Back to Supporting Files</a>
+            </p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>
