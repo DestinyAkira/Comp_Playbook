@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import os
-import datetime # Import datetime for timestamps
+import datetime
 
 app = Flask(__name__)
 
 # Define the path for the sign-off log file
-# It's good practice to define this at the top or in a config.
-SIGN_OFF_LOG_FILE = 'sign_off_log.txt' # This will be created in your main project directory
+SIGN_OFF_LOG_FILE = 'sign_off_log.txt'
 
 # --- Data for the Playbook ---
 roles_data = {
@@ -104,12 +103,16 @@ domain_questions = {
     ]
 }
 
-
 # --- Routes ---
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# NEW ROUTE
+@app.route('/interactive_workflow')
+def interactive_workflow():
+    return render_template('interactive_workflow.html', lifecycle_stages=audit_lifecycle_data)
 
 @app.route('/roles')
 def roles():
@@ -166,15 +169,16 @@ def calculate_score():
 
     if 90 <= total_score <= 100:
         rating = "✅ Compliant"
-        meaning = "No major risks; minor improvements"
+        meaning = "This domain meets or exceeds the required compliance standards. No major risks were identified, though minor improvements should be considered to maintain a high level of performance."
     elif 70 <= total_score <= 89:
         rating = "⚠️ Partially Compliant"
-        meaning = "Some risks; action required"
+        meaning = "This domain is generally compliant but has identified areas of risk and non-conformance. A formal remediation plan is required to address the gaps and prevent potential future non-compliance."
     else:
         rating = "❌ Non-Compliant"
-        meaning = "Does not meet requirements; urgent action needed"
+        meaning = "This domain does not meet core compliance requirements. Immediate and urgent action is needed. A comprehensive corrective action plan must be developed and a re-audit is required to restore compliance."
 
     return jsonify(total_score=total_score, rating=rating, meaning=meaning)
+
 
 @app.route('/supporting_files')
 def supporting_files():
@@ -184,23 +188,18 @@ def supporting_files():
 def self_assessment_form_page():
     return render_template('self_assessment_form.html')
 
-# --- NEW SIGN-OFF SECTION ROUTES ---
 @app.route('/sign_off', methods=['GET', 'POST'])
 def sign_off():
     if request.method == 'POST':
         user_name = request.form.get('user_name')
         if user_name:
-            # Get current timestamp
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            # Create the log entry
             log_entry = f"{timestamp} - {user_name} has reviewed the Playbook and SOP.\n"
 
-            # Append to the log file
             try:
                 with open(SIGN_OFF_LOG_FILE, 'a') as f:
                     f.write(log_entry)
                 message = "Thank you for signing off! Your entry has been recorded."
-                # You might want to clear the form or redirect after successful submission
                 return render_template('sign_off.html', message=message, show_form=False)
             except IOError:
                 message = "Error: Could not write to the sign-off log file. Please try again later."
@@ -209,7 +208,6 @@ def sign_off():
             message = "Please enter your name to sign off."
             return render_template('sign_off.html', message=message, show_form=True)
 
-    # For GET request, simply render the sign-off form
     return render_template('sign_off.html', message=None, show_form=True)
 
 

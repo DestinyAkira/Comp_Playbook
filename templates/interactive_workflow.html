@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comp Playbook - Interactive Workflow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Interactive Compliance Audit Workflow</h2>
+        <section>
+            <p style="text-align: center;">
+                This visual guide outlines the complete compliance audit process. Hover over each stage to see the progression.
+            </p>
+            <div class="workflow-container">
+                <div class="workflow-center">
+                    <img src="{{ url_for('static', filename='gear-icon.svg') }}" alt="Workflow Start" class="center-icon">
+                </div>
+                {% for stage in lifecycle_stages %}
+                    <div class="workflow-step">
+                        <h3>{{ stage.stage }}</h3>
+                    </div>
+                {% endfor %}
+            </div>
+            <p style="text-align: center; margin-top: 30px;">
+                For full details on each stage, please visit the <a href="/lifecycle">Audit Lifecycle</a> page.
+            </p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>
