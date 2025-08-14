@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comp Playbook - Sign Off</title>
+    <title>Sign Off - Comp Playbook</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -17,29 +17,51 @@
                 <li><a href="/audit_form">Audit Form</a></li>
                 <li><a href="/score_calculator">Score Calculator</a></li>
                 <li><a href="/supporting_files">Supporting Files</a></li>
-                <li><a href="/sign_off">Sign Off</a></li> {# Added new navigation link #}
+                <li><a href="/sign_off">Sign Off</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <h2>Playbook & SOP Sign-Off</h2>
+        <h2>Sign Off</h2>
         <section class="sign-off-container">
-            <p>Please enter your name below to confirm that you have reviewed the Compliance Playbook and the Standard Operating Procedure (SOP).</p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
 
-            {% if message %}
-                <p class="form-message">{{ message }}</p>
+            {% if account_type == 'lead' %}
+            <h3>Signed-Off Analysts</h3>
+            <p>Below is a list of all analysts who have signed off on the playbook.</p>
+            {% if sign_offs %}
+                <ul class="sign-offs-list">
+                    {% for sign_off in sign_offs %}
+                        <li>
+                            <strong>{{ sign_off.user.username }}</strong> signed off on {{ sign_off.timestamp.strftime('%Y-%m-%d at %H:%M') }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No analysts have signed off yet.</p>
             {% endif %}
 
-            {% if show_form %}
-                <form method="POST" action="{{ url_for('sign_off') }}">
-                    <div class="form-group">
-                        <label for="user_name">Your Full Name:</label>
-                        <input type="text" id="user_name" name="user_name" required>
+            {% elif account_type == 'analyst' %}
+                {% if signed_off %}
+                    <div class="form-message success">
+                        <p>✅ You have already signed off on the playbook on {{ signed_off.timestamp.strftime('%Y-%m-%d at %H:%M') }}.</p>
                     </div>
-                    <button type="submit">Sign Off</button>
-                </form>
+                {% else %}
+                    <p>By clicking the button below, you confirm that you have completed all modules of the playbook.</p>
+                    <form action="{{ url_for('sign_off') }}" method="post">
+                        <button type="submit">Sign Off on Playbook</button>
+                    </form>
+                {% endif %}
             {% else %}
-                <p>Thank you for your submission. You can return to the <a href="/">Home page</a> or <a href="/supporting_files">Supporting Files</a>.</p>
+                <p>Invalid account type. Please contact support.</p>
             {% endif %}
         </section>
     </main>

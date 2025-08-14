@@ -1,215 +1,168 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
 import os
-import datetime
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
+# Initialize Flask App and database
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comp_playbook.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-# Define the path for the sign-off log file
-SIGN_OFF_LOG_FILE = 'sign_off_log.txt'
+# Define the secret code for lead registration
+LEAD_REGISTRATION_CODE = "SUPERSECRET123"
 
-# --- Data for the Playbook ---
-roles_data = {
-    "Audit Team Lead": {"personnel": "Ross Browne", "responsibilities": "Oversee audit process, maintain SOP, review annually or after each cycle"},
-    "Audit Team Members": {"personnel": "Akira Devonish, Cherelle Griffith, etc.", "responsibilities": "Conduct audits per SOP, suggest improvements"},
-    "Domain Lead": {"personnel": "Terry Bennett", "responsibilities": "Submit self-assessments, provide accurate info during interviews"},
-    "Domain Co-Lead": {"personnel": "Destiny Holder", "responsibilities": "Assist Domain Lead in submitting self-assessments and providing information during interviews"},
-    "Data Librarian": {"personnel": "Roger Barrow", "responsibilities": "Version control, secure storage of audit documentation"},
-    "Domain Coordinator": {"personnel": "Dale Edwards", "responsibilities": "Oversight, SOP adherence checks, improvement recommendations"}
-}
+# --- Database Models ---
 
-audit_lifecycle_data = [
-    {"stage": "1. Audit Preparation", "timeline": "1–2 weeks before audit", "details": [
-        "Select domain(s) to be audited.",
-        "Share Preliminary Self-Assessment Form. (Includes: team structure, current activities, baseline compliance questions.)",
-        "Set deadline for submission.",
-        "Assign roles for interviews: Lead Interviewer, Scribe, Compliance Checker."
-    ]},
-    {"stage": "2. Question Development", "timeline": "1 week before interview", "details": [
-        "Customize the Master Audit Template (V2) for the domain.",
-        "Base questions on: Self-assessment responses, Known risks/gaps, Regulatory frameworks (GDPR, BDPA, EU AI Act, etc.)",
-        "Include a mix of yes/no, short answer, and open-ended questions.",
-        "Reference Template: Master_Audit_Template_V2.pdf"
-    ]},
-    {"stage": "3. Conducting Interviews", "timeline": "Scheduled per domain availability", "details": [
-        "Set up interviews with domain leads.",
-        "Use customized audit template as a guide.",
-        "Remind participants about structure, confidentiality, and recording (if applicable).",
-        "Stick to roles unless reassignment is needed due to team size."
-    ]},
-    {"stage": "4. Scoring & Evaluation", "timeline": "2–3 days post-interview", "details": [
-        "Each team member scores their assigned sections. Use the provided rubric:",
-        "Data Cleaning & Processing (Max: 40)",
-        "Data Storage, Security & Privacy (Max: 30)",
-        "Compliance & Accountability (Max: 20)",
-        "Continuous Improvement & Culture (Max: 10)",
-        "Compliance Score Summary: 90–100% (Compliant), 70–89% (Partially Compliant), < 70% (Non-Compliant)"
-    ]},
-    {"stage": "5. Compiling the Report", "timeline": "3–5 days post-scoring", "details": [
-        "Include in final audit report: Domain overview, Interview summary, Scores per section, Risks, findings, and action recommendations.",
-        "Example Report: Domain_C_ReportExample_2025_V1.pdf"
-    ]},
-    {"stage": "6. Submission & Feedback", "timeline": "1 week after reporting", "details": [
-        "Submit reports to: Compliance Team Lead",
-        "Relevant Domain Lead.",
-        "Request feedback: Agree on remediation actions, Offer compliance support where needed."
-    ]},
-    {"stage": "7. Archiving & Continuous Improvement", "timeline": "Ongoing",
-     "details": [
-        "Archive all reports and notes securely (Data Librarian role).",
-        "Conduct post-audit debrief: Lessons learned, SOP/process refinement, Feedback loop for the team.",
-        "Example Form: DClean_Compliance_Q1-2025_VFinal.pdf"
-    ]}
-]
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
+    account_type = db.Column(db.String(20), default='analyst') # 'analyst' or 'lead'
 
-supporting_files_data = [
-    {"title": "Master_Audit_Template_V2.pdf", "purpose": "Guide for customizing audit questions", "link": "Master_Audit_Template_V2.pdf"},
-    {"title": "Domain_C_ReportExample_2025_V1.pdf", "purpose": "Sample final report", "link": "Domain_C_ReportExample_2025_V1.pdf"},
-    {"title": "DClean_Compliance_Q1-2025_VFinal.pdf", "purpose": "Completed domain audit form", "link": "DClean_Compliance_Q1-2025_VFinal.pdf"},
-    {"title": "Compliance_Audit_SOP (1).pdf", "purpose": "Standard Operating Procedure for Compliance Audits", "link": "Compliance_Audit_SOP (1).pdf"},
-    {"title": "Self-Assessment Form", "purpose": "Baseline data gathering (Microsoft Form)", "link": "self_assessment_form_page"}
-]
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
-domains = [
-    "Data Collection",
-    "Data Cleaning",
-    "Data Engineering",
-    "Compliance, Ethics and Regulations"
-]
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
-domain_questions = {
-    "Data Collection": [
-        {"id": "q1_dc", "type": "radio", "question": "Is there a clear data collection policy in place?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q2_dc", "type": "textarea", "question": "Describe the primary methods used for data collection.", "placeholder": "e.g., APIs, manual input, web scraping..."},
-        {"id": "q3_dc", "type": "radio", "question": "Are user consents obtained for all personal data collected?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q4_dc", "type": "text", "question": "What tools are used for data ingestion?", "placeholder": "e.g., Kafka, NiFi, custom scripts..."},
-    ],
-    "Data Cleaning": [
-        {"id": "q1_dcl", "type": "radio", "question": "Are formal data validation rules applied during cleaning?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q2_dcl", "type": "textarea", "question": "Outline the process for handling missing or inconsistent data.", "placeholder": "e.g., imputation, deletion, flagging..."},
-        {"id": "q3_dcl", "type": "radio", "question": "Is data quality regularly monitored and reported?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q4_dcl", "type": "text", "question": "Which data cleaning tools or scripts are utilized?", "placeholder": "e.g., Pandas, Spark, Trifacta..."},
-    ],
-    "Data Engineering": [
-        {"id": "q1_de", "type": "radio", "question": "Are data pipelines documented and version-controlled?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q2_de", "type": "textarea", "question": "Describe the architecture of your data storage solutions.", "placeholder": "e.g., Data Lake, Data Warehouse, specific databases..."},
-        {"id": "q3_de", "type": "radio", "question": "Are there automated tests for data pipeline integrity?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q4_de", "type": "text", "question": "What is the frequency of data backups?", "placeholder": "e.g., daily, weekly, continuously..."},
-    ],
-    "Compliance, Ethics and Regulations": [
-        {"id": "q1_cer", "type": "radio", "question": "Does the team adhere to GDPR/BDPA regulations?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q2_cer", "type": "textarea", "question": "How are ethical considerations addressed in AI development?", "placeholder": "e.g., bias detection, fairness metrics..."},
-        {"id": "q3_cer", "type": "radio", "question": "Are internal compliance audits conducted annually?", "options": ["Yes", "No", "N/A"]},
-        {"id": "q4_cer", "type": "text", "question": "Which regulatory frameworks are most relevant to your current projects?", "placeholder": "e.g., EU AI Act, HIPAA..."},
-    ]
-}
+class SignOff(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('sign_offs', lazy=True))
+
+# Create database and tables
+with app.app_context():
+    db.create_all()
 
 # --- Routes ---
 
 @app.route('/')
-def index():
+def home():
     return render_template('index.html')
 
-# NEW ROUTE
-@app.route('/interactive_workflow')
-def interactive_workflow():
-    return render_template('interactive_workflow.html', lifecycle_stages=audit_lifecycle_data)
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        code = request.form.get('lead_code')
+
+        user_exists = User.query.filter_by(username=username).first()
+        if user_exists:
+            flash('Username already exists. Please choose a different one.', 'error')
+            return redirect(url_for('register'))
+
+        if code and code == LEAD_REGISTRATION_CODE:
+            account_type = 'lead'
+        else:
+            account_type = 'analyst'
+
+        new_user = User(username=username, account_type=account_type)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash(f'Account created successfully as {account_type}.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.check_password(password):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['account_type'] = user.account_type
+            flash('Logged in successfully.', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid username or password.', 'error')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    session.pop('username', None)
+    session.pop('account_type', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
+
+@app.route('/sign_off', methods=['GET', 'POST'])
+def sign_off():
+    if 'user_id' not in session:
+        flash('You must be logged in to view this page.', 'warning')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    account_type = session['account_type']
+
+    if request.method == 'POST':
+        if account_type == 'analyst':
+            existing_sign_off = SignOff.query.filter_by(user_id=user_id).first()
+            if not existing_sign_off:
+                new_sign_off = SignOff(user_id=user_id)
+                db.session.add(new_sign_off)
+                db.session.commit()
+                flash('You have successfully signed off on the playbook.', 'success')
+            return redirect(url_for('sign_off'))
+        else:
+            flash('Leads cannot sign off on the playbook.', 'error')
+            return redirect(url_for('sign_off'))
+
+    if account_type == 'lead':
+        all_sign_offs = SignOff.query.order_by(SignOff.timestamp.desc()).all()
+        return render_template('sign_off.html', account_type=account_type, sign_offs=all_sign_offs)
+    else: # analyst
+        signed_off = SignOff.query.filter_by(user_id=user_id).first()
+        return render_template('sign_off.html', account_type=account_type, signed_off=signed_off)
+
+
+# --- Example routes (can be extended) ---
 
 @app.route('/roles')
 def roles():
+    # Example data for demonstration
+    roles_data = [
+        {"title": "Role 1", "description": "Description of Role 1."},
+        {"title": "Role 2", "description": "Description of Role 2."}
+    ]
     return render_template('roles.html', roles=roles_data)
 
 @app.route('/lifecycle')
 def lifecycle():
-    return render_template('lifecycle.html', lifecycle_stages=audit_lifecycle_data)
+    # Example data
+    lifecycle_data = [
+        {"stage": "Stage 1", "description": "Details for Stage 1."},
+        {"stage": "Stage 2", "description": "Details for Stage 2."}
+    ]
+    return render_template('lifecycle.html', lifecycle=lifecycle_data)
 
-@app.route('/audit_form', methods=['GET', 'POST'])
+@app.route('/audit_form')
 def audit_form():
-    selected_domain = None
-    questions_for_domain = []
-
-    if request.method == 'POST':
-        selected_domain = request.form.get('domain_select')
-        if selected_domain and selected_domain in domain_questions:
-            questions_for_domain = domain_questions[selected_domain]
-
-    return render_template(
-        'audit_form.html',
-        domains=domains,
-        selected_domain=selected_domain,
-        questions=questions_for_domain
-    )
-
-@app.route('/submit_audit', methods=['POST'])
-def submit_audit():
-    submitted_domain = request.form.get('domain')
-    audit_responses = {}
-
-    if submitted_domain and submitted_domain in domain_questions:
-        for q in domain_questions[submitted_domain]:
-            response_key = q['id']
-            audit_responses[q['question']] = request.form.get(response_key, 'No Response')
-
-    return render_template('audit_summary.html',
-                           submitted_domain=submitted_domain,
-                           audit_responses=audit_responses)
-
+    return render_template('audit_form.html')
 
 @app.route('/score_calculator')
 def score_calculator():
     return render_template('score_calculator.html')
 
-@app.route('/calculate_score', methods=['POST'])
-def calculate_score():
-    data_cleaning = int(request.form.get('data_cleaning', 0))
-    data_storage = int(request.form.get('data_storage', 0))
-    compliance = int(request.form.get('compliance', 0))
-    improvement = int(request.form.get('improvement', 0))
-
-    total_score = data_cleaning + data_storage + compliance + improvement
-
-    if 90 <= total_score <= 100:
-        rating = "✅ Compliant"
-        meaning = "This domain meets or exceeds the required compliance standards. No major risks were identified, though minor improvements should be considered to maintain a high level of performance."
-    elif 70 <= total_score <= 89:
-        rating = "⚠️ Partially Compliant"
-        meaning = "This domain is generally compliant but has identified areas of risk and non-conformance. A formal remediation plan is required to address the gaps and prevent potential future non-compliance."
-    else:
-        rating = "❌ Non-Compliant"
-        meaning = "This domain does not meet core compliance requirements. Immediate and urgent action is needed. A comprehensive corrective action plan must be developed and a re-audit is required to restore compliance."
-
-    return jsonify(total_score=total_score, rating=rating, meaning=meaning)
-
-
 @app.route('/supporting_files')
 def supporting_files():
-    return render_template('supporting_files.html', files=supporting_files_data)
+    return render_template('supporting_files.html')
 
-@app.route('/self_assessment_form_page')
-def self_assessment_form_page():
-    return render_template('self_assessment_form.html')
-
-@app.route('/sign_off', methods=['GET', 'POST'])
-def sign_off():
-    if request.method == 'POST':
-        user_name = request.form.get('user_name')
-        if user_name:
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            log_entry = f"{timestamp} - {user_name} has reviewed the Playbook and SOP.\n"
-
-            try:
-                with open(SIGN_OFF_LOG_FILE, 'a') as f:
-                    f.write(log_entry)
-                message = "Thank you for signing off! Your entry has been recorded."
-                return render_template('sign_off.html', message=message, show_form=False)
-            except IOError:
-                message = "Error: Could not write to the sign-off log file. Please try again later."
-                return render_template('sign_off.html', message=message, show_form=True)
-        else:
-            message = "Please enter your name to sign off."
-            return render_template('sign_off.html', message=message, show_form=True)
-
-    return render_template('sign_off.html', message=None, show_form=True)
-
+@app.route('/interactive_workflow')
+def interactive_workflow():
+    return render_template('interactive_workflow.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

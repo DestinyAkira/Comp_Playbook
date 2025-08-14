@@ -655,234 +655,114 @@ footer {
     border: 1px solid #f5c6cb;
 }
 
-/* --- UPDATED STYLES FOR INTERACTIVE WORKFLOW (CIRCULAR LAYOUT) --- */
-/*
-  This new CSS uses CSS variables and transforms to create a circular layout
-  for the workflow steps. The old flexbox layout is kept for mobile.
-*/
+/* --- NEW STYLES FOR LINEAR WORKFLOW (from user's image) --- */
 
-.workflow-container {
-    --circle-radius: 400px;
-    --step-count: 7;
+.linear-workflow-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px auto;
+    width: 100%;
+    max-width: 500px;
     position: relative;
-    width: 850px;
-    height: 850px;
-    margin: 40px 0 40px 20px;
-    list-style: none;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-/* New central element styling */
-.workflow-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 180px;
-    height: 180px;
-    background-color: #e0f0ff;
-    border-radius: 50%;
-    border: 5px solid #0056b3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    animation: pulse 2s infinite ease-in-out;
-    z-index: 2; /* Ensure it's on top */
+.linear-workflow-step {
+    width: 100%;
+    padding: 15px 25px;
+    margin-bottom: 30px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    z-index: 10;
 }
 
-.workflow-center .center-icon {
-    width: 60%;
-    height: 60%;
-    animation: spin 8s linear infinite;
+.linear-workflow-step:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Updated dashed circle path */
-.workflow-container::before {
+.linear-workflow-step h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1em;
+    text-align: center;
+}
+
+/* Vertical connecting lines and arrows */
+.linear-workflow-step::after {
     content: '';
     position: absolute;
-    top: 50%;
+    top: 100%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(45deg);
-    width: calc(var(--circle-radius) * 2 - 20px);
-    height: calc(var(--circle-radius) * 2 - 20px);
-    border: 3px dashed #a8d5ff;
-    border-radius: 50%;
-    z-index: 0;
+    width: 2px;
+    height: 30px;
+    background-color: #555;
+    transform: translateX(-50%);
+    z-index: 5;
 }
 
-.workflow-step {
-    --step-index: 0;
-    --angle: calc((var(--step-index) * 360deg / var(--step-count)));
-    position: absolute;
-    top: 50%;
+.linear-workflow-step:not(#step-7)::after {
+    content: '↓'; /* Arrow down */
+    font-size: 2em;
+    line-height: 1;
+    color: #555;
     left: 50%;
-    width: 250px;
-    height: 120px;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    background-color: #f0f8ff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    cursor: pointer;
-    transform-origin: 50% 50%;
-    /* MODIFIED: Removed the counter-rotation to align the card with the path */
-    transform: rotate(var(--angle)) translateY(calc(-1 * var(--circle-radius)));
+    top: 100%;
+    transform: translateX(-50%);
+    width: 0;
+    height: auto;
+    margin-top: 5px;
 }
 
-.workflow-step:nth-child(1) { --step-index: 0; }
-.workflow-step:nth-child(2) { --step-index: 1; }
-.workflow-step:nth-child(3) { --step-index: 2; }
-.workflow-step:nth-child(4) { --step-index: 3; }
-.workflow-step:nth-child(5) { --step-index: 4; }
-.workflow-step:nth-child(6) { --step-index: 5; }
-.workflow-step:nth-child(7) { --step-index: 6; }
-
-.workflow-step:hover {
-    /* MODIFIED: Adjusted hover effect to match new transform */
-    transform: rotate(var(--angle)) translateY(calc(-1 * var(--circle-radius) - 20px));
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+/* Remove the arrow from the last step */
+.linear-workflow-step:last-child::after {
+    content: none;
 }
 
-.workflow-step h3 {
-    text-align: center;
-    color: #004085;
-    margin: 0;
-    font-size: 1.1em;
-}
-
-/* Arrows between steps */
-.workflow-step::after {
-    content: '→';
+/* Feedback loop lines */
+.linear-workflow-container::before {
+    content: '';
     position: absolute;
-    top: 50%;
-    left: 100%;
-    transform: translateY(-50%) translateX(10px) rotate(90deg); /* MODIFIED: Simplified arrow rotation to be a single rotation from the new card orientation */
-    font-size: 2.5em;
-    color: #007bff;
-    opacity: 0.7;
+    top: calc(var(--step-height, 0px) * 2 + 100px); /* Adjust based on step height and margin */
+    left: calc(50% + 150px); /* Position the line to the right */
+    width: 100px;
+    height: calc(var(--step-height, 0px) * 2 + 120px);
+    border: 2px solid #555;
+    border-left: none;
+    border-top: none;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
     z-index: 1;
 }
 
-.workflow-step:last-child::after {
-    content: '';
+.linear-workflow-container::after {
+    content: '←'; /* Arrow left */
+    font-size: 2em;
+    color: #555;
+    position: absolute;
+    top: calc(var(--step-height, 0px) * 2 + 100px);
+    left: calc(50% + 150px);
+    transform: translateX(-150px) translateY(-50%) rotate(0deg);
+    z-index: 1;
 }
 
-/* New animations for impact */
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-@keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 0 0 0 0 rgba(0, 86, 179, 0.4);
-    }
-    70% {
-        transform: translate(-50%, -50%) scale(1.05);
-        box-shadow: 0 0 0 20px rgba(0, 86, 179, 0);
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 0 0 0 0 rgba(0, 86, 179, 0);
-    }
-}
-
-/* Responsive Design for the Workflow */
-@media (max-width: 1000px) {
-    .workflow-container {
-        width: 100%;
-        height: auto;
-        flex-direction: column;
-        gap: 30px;
-        margin: 0 auto;
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .linear-workflow-container {
+        padding: 0 10px;
     }
 
-    .workflow-container::before {
-        content: '';
-        border: none;
-        width: 0;
-        height: 0;
-    }
-
-    .workflow-center {
-        display: none;
-    }
-
-    .workflow-step {
-        position: static;
-        transform: none;
-        width: 100%;
-        height: auto;
-    }
-    
-    .workflow-step::after {
-        content: '↓';
-        position: static;
-        display: block;
-        text-align: center;
-        margin-top: 10px;
-        font-size: 2.5em;
-        transform: none;
-    }
-    .workflow-step:last-child::after {
-        content: '';
-    }
-}
-
-/* Responsive Design - Basic Media Queries */
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 1.8em;
-    }
-    nav ul {
-        flex-direction: column;
-        align-items: center;
-    }
-    nav ul li {
-        margin: 8px 0;
-    }
-    main {
-        padding: 20px;
-        margin: 20px auto;
-    }
-    h2 {
-        font-size: 1.5em;
-    }
-    .roles-container,
-    .lifecycle-container,
-    .files-container {
-        grid-template-columns: 1fr;
-    }
-    .form-selection-container select {
+    .linear-workflow-step {
         width: calc(100% - 20px);
+        margin: 0 auto 30px;
     }
-    .sign-off-container input[type="text"] {
-        width: calc(100% - 22px);
-    }
-}
 
-@media (max-width: 480px) {
-    main {
-        padding: 15px;
-    }
-    section {
-        padding: 15px;
-    }
-    button {
-        width: 100%;
-    }
-    .summary-actions .button {
-        display: block;
-        margin: 10px auto;
-        width: calc(100% - 20px);
+    .linear-workflow-container::before,
+    .linear-workflow-container::after {
+        display: none; /* Hide the feedback loop on smaller screens */
     }
 }

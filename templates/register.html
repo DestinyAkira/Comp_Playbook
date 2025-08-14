@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Comp Playbook</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Comp Playbook</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/roles">Roles & Responsibilities</a></li>
+                <li><a href="/lifecycle">Audit Lifecycle</a></li>
+                <li><a href="/audit_form">Audit Form</a></li>
+                <li><a href="/score_calculator">Score Calculator</a></li>
+                <li><a href="/supporting_files">Supporting Files</a></li>
+                <li><a href="/sign_off">Sign Off</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Register</h2>
+        <section>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="lead_code">Lead Registration Code (Optional):</label>
+                    <input type="password" id="lead_code" name="lead_code">
+                    <small>Enter the code here to register as a Lead account.</small>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Comp Playbook. All rights reserved.</p>
+    </footer>
+</body>
+</html>

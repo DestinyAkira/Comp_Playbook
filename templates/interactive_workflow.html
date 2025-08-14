@@ -25,21 +25,31 @@
         <h2>Interactive Compliance Audit Workflow</h2>
         <section>
             <p style="text-align: center;">
-                This visual guide outlines the complete compliance audit process. Hover over each stage to see the progression.
+                This visual guide outlines the complete compliance audit process. The lines illustrate the flow and feedback loops.
             </p>
-            <div class="workflow-container">
-                <div class="workflow-center">
-                    <img src="{{ url_for('static', filename='gear-icon.svg') }}" alt="Workflow Start" class="center-icon">
+            <div class="linear-workflow-container">
+                <div class="linear-workflow-step" id="step-1">
+                    <h3>1. Audit Preparation</h3>
                 </div>
-                {% for stage in lifecycle_stages %}
-                    <div class="workflow-step">
-                        <h3>{{ stage.stage }}</h3>
-                    </div>
-                {% endfor %}
+                <div class="linear-workflow-step" id="step-2">
+                    <h3>2. Question Development</h3>
+                </div>
+                <div class="linear-workflow-step" id="step-3">
+                    <h3>3. Conducting Interviews</h3>
+                </div>
+                <div class="linear-workflow-step" id="step-4">
+                    <h3>4. Scoring & Evaluation</h3>
+                </div>
+                <div class="linear-workflow-step" id="step-5">
+                    <h3>5. Compiling the Report</h3>
+                </div>
+                <div class="linear-workflow-step" id="step-6">
+                    <h3>6. Submission & Feedback</h3>
+                </div>
+                <div class="linear-workflow-step" id="step-7">
+                    <h3>7. Archiving & Continuous Improvement</h3>
+                </div>
             </div>
-            <p style="text-align: center; margin-top: 30px;">
-                For full details on each stage, please visit the <a href="/lifecycle">Audit Lifecycle</a> page.
-            </p>
         </section>
     </main>
     <footer>
