@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comp Playbook - Roles & Responsibilities</title>
+    <title>Roles & Responsibilities - Comp Playbook</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -17,7 +17,7 @@
                 <li><a href="/audit_form">Audit Form</a></li>
                 <li><a href="/score_calculator">Score Calculator</a></li>
                 <li><a href="/supporting_files">Supporting Files</a></li>
-                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+                <li><a href="/sign_off">Sign Off</a></li>
             </ul>
         </nav>
     </header>
@@ -25,16 +25,51 @@
         <h2>Roles & Responsibilities</h2>
         <section>
             <p>
-                Effective compliance relies on clear roles and responsibilities. The following outlines the key personnel and their duties within the compliance audit framework.
+                A clear understanding of roles is crucial for a smooth and efficient audit. Below are the key roles and their responsibilities.
             </p>
             <div class="roles-container">
-                {% for role, details in roles.items() %}
-                    <div class="role-card">
-                        <h3>{{ role }}</h3>
-                        <p><strong>Personnel:</strong> {{ details.personnel }}</p>
-                        <p><strong>Responsibilities:</strong> {{ details.responsibilities }}</p>
-                    </div>
-                {% endfor %}
+                <div class="role-card">
+                    <h3>Compliance Audit Team Lead</h3>
+                    <p>
+                        <strong>Responsibilities:</strong> Oversees the audit process, maintains this SOP, and ensures it is reviewed and updated at least annually or after each audit cycle.<br>
+                        <strong>Team Member:</strong> Ross Browne
+                    </p>
+                </div>
+                <div class="role-card">
+                    <h3>Audit Team Members</h3>
+                    <p>
+                        <strong>Responsibilities:</strong> Responsible for conducting audits as per this SOP, contributing to refinements based on audit findings and team feedback.<br>
+                        <strong>Team Members:</strong> Akira Devonish, Cherelle Griffith, Christopher Gilkes, Tansha Powlett, Tazia Holder, Tyrell McCollin, Victor Clarke, Roger Barrow
+                    </p>
+                </div>
+                <div class="role-card">
+                    <h3>Domain Lead</h3>
+                    <p>
+                        <strong>Responsibilities:</strong> Expected to participate in the audit process and provide accurate and timely information during assessments.<br>
+                        <strong>Team Member:</strong> Terry Bennett
+                    </p>
+                </div>
+                <div class="role-card">
+                    <h3>Domain Co-Lead</h3>
+                    <p>
+                        <strong>Responsibilities:</strong> Assist lead in the audit process and provide accurate and timely information during assessments.<br>
+                        <strong>Team Member:</strong> Destiny Holder
+                    </p>
+                </div>
+                <div class="role-card">
+                    <h3>Data Librarian</h3>
+                    <p>
+                        <strong>Responsibilities:</strong> Expected to monitor work product for version control, ensure that the work product is stored appropriately and securely.<br>
+                        <strong>Team Member:</strong> Roger Barrow
+                    </p>
+                </div>
+                <div class="role-card">
+                    <h3>Domain Coordinator</h3>
+                    <p>
+                        <strong>Responsibilities:</strong> May review SOP adherence and provide oversight or recommendations for improvement.<br>
+                        <strong>Team Member:</strong> Dale Edwards
+                    </p>
+                </div>
             </div>
         </section>
     </main>

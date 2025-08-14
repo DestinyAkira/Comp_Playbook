@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comp Playbook - Audit Lifecycle</title>
+    <title>Audit Lifecycle - Comp Playbook</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -17,29 +17,72 @@
                 <li><a href="/audit_form">Audit Form</a></li>
                 <li><a href="/score_calculator">Score Calculator</a></li>
                 <li><a href="/supporting_files">Supporting Files</a></li>
-                <li><a href="/sign_off">Sign Off</a></li> {# ADDED: New Sign Off link #}
+                <li><a href="/sign_off">Sign Off</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <h2>Compliance Audit Lifecycle</h2>
+        <h2>Audit Lifecycle</h2>
         <section>
             <p>
-                The compliance audit process follows a structured lifecycle to ensure thoroughness and consistency. Each stage has specific activities and timelines.
+                The audit lifecycle is a structured, seven-step process that ensures a comprehensive and effective compliance review.
             </p>
             <div class="lifecycle-container">
-                {% for stage in lifecycle_stages %}
-                    <div class="lifecycle-stage">
-                        <h3>{{ stage.stage }}</h3>
-                        <p><strong>Timeline:</strong> {{ stage.timeline }}</p>
-                        <h4>Details:</h4>
-                        <ul>
-                            {% for detail in stage.details %}
-                                <li>{{ detail }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endfor %}
+                <div class="lifecycle-stage">
+                    <h3>1. Audit Preparation</h3>
+                    <ul>
+                        <li>Identify the domain(s) to be audited.</li>
+                        <li>Send out a preliminary self-assessment form to the domain lead(s) to gather basic information about team structure and activities.</li>
+                        <li>Include baseline compliance questions to encourage teams to reflect on their practices.</li>
+                        <li>Set deadlines for preliminary form submission.</li>
+                        <li>Assign audit team members to specific interview roles.</li>
+                    </ul>
+                </div>
+                <div class="lifecycle-stage">
+                    <h3>2. Question Development</h3>
+                    <ul>
+                        <li>Customize the Master Audit Template with domain-specific questions.</li>
+                        <li>Base questions on preliminary form responses, known gaps, and relevant frameworks (e.g., GDPR, BDPA, EU AI Act).</li>
+                        <li>Ensure each section includes actionable, clear questions that can range from yes/no to open-ended.</li>
+                    </ul>
+                </div>
+                <div class="lifecycle-stage">
+                    <h3>3. Conducting Interviews</h3>
+                    <ul>
+                        <li>Schedule interviews with domain leads and use the completed Master Audit Template as a guide to ask questions about their activities and practices.</li>
+                        <li>Ensure interviews are focused, respectful, and that consent is obtained if sessions are to be recorded.</li>
+                        <li>The assignment and responsibilities of interview roles can be adjusted based on the size and dynamics of the audit team.</li>
+                    </ul>
+                </div>
+                <div class="lifecycle-stage">
+                    <h3>4. Scoring and Evaluation</h3>
+                    <ul>
+                        <li>Team members score their assigned sections after the interviews.</li>
+                    </ul>
+                </div>
+                <div class="lifecycle-stage">
+                    <h3>5. Compiling the Report</h3>
+                    <ul>
+                        <li>Compile the following for the reports:</li>
+                        <li>Overview of the audited domain.</li>
+                        <li>Summary of findings.</li>
+                        <li>Scores and recommendations based on feedback from the team.</li>
+                    </ul>
+                </div>
+                <div class="lifecycle-stage">
+                    <h3>6. Submission and Feedback</h3>
+                    <ul>
+                        <li>Submit reports to Compliance and domain leads.</li>
+                        <li>Request feedback on findings and support needed for implementation.</li>
+                    </ul>
+                </div>
+                <div class="lifecycle-stage">
+                    <h3>7. Archiving and Continuous Improvement</h3>
+                    <ul>
+                        <li>Archive reports and documentation.</li>
+                        <li>Conduct a post-audit review and refine the process for the next cycle.</li>
+                    </ul>
+                </div>
             </div>
         </section>
     </main>
